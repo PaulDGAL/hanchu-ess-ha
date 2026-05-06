@@ -1,3 +1,9 @@
+// ===== icons =====
+const HANCHUESS_ICONS = {
+  charging: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAqlJREFUeAHtmk9y0zAUxj/FKcMyRwg3iE+Au2QYUjgB4QicgHAC4ATACdKU6RrfwL5BzQnwkhkahOTOtE5tSe/Jkrrpb+FF/GT7WZ/eHznAIw+LAJdqtwCy1/QBWY38ZY1I8B2o91dq2JIzBFKcIn9VIgIzlnV1uWI/fGR4DuCaIZ1bmlhvX8NzQIjnYDMrERG6A9VuqY4FuEj5HRFhzEBWgE9U+WjoDghxBjZx5dPdgW4qC3CJLB8NzYHqR6GOC/CILh8NcQb+eYTP+PLp7kKyEuDrP4F8NO5SQodPkV2BR4PV+hkSQJgBn/CZRj7dnZwWAm/BJZF8NHYJ6dJZZL/BI5l8NHP7aR/5yBbVxYZg2AInqld40WACdgd8og/ESo37SrP926jDpNlyrAGP7JsYswMpmhd5coqJWGbAq3mhI/F+qv41Zge8mhciUn5Bvv6MAIw74Nu80GhUbbVFIAxRyKt5odB0us/XLQJhkFCk6BNI930MDogSoZHyo3rz5wgMf2OrT32hE9aGYFmq8mJyyBxjjkloqTnfgdb9O+PZm3rr090lsefMlL8DXZspl067btFada9b1U1vwC91IDvA3JnrQ2gzIyza+/g74Cr0AiYrG34OuOukJmSysuG5Bg6F5WTwZGXDzwGbfEy672ZttEA83m/SNVi13w7NRD0WnfgO2OqkLlmdGSLIQTU64gPcFMquGP48+4aR6OSxBox1UqkefovE8B0Y3+S1J6uI8CTUfeCTQx27k5XicA75tBz+fq02zuTPu2up8IsnI+H3z2hQYK6BEflQk1X+Rj/A8CGqnb5u/5eWk/yYn5juRZ9EycoGcw0c9QlNqmRlgy6h4+ItabKy4VdKJCjSqNBnQH9tqS5zJZtF4C8vrXohvRA8j/a3hEdi8B9eFcj5fjk7/gAAAABJRU5ErkJggg==",
+  discharging: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAApVJREFUeAHtmUGO0zAUhv/nVDDseoSZDVK74gaEE5QbMJVatoQTMNwgM+xAo8ANOEJuQDeoy+YGdDkLEmNXIxRo4vg5tmcW/TatGrfqH//2/54DnHhYCEyKXTZt7vDadnydYPP2eb5BINgCbrfvdhLynPMdCfFqPctLBEBwBn/+mb3g/vnQsASQaKyt06IKdfc1PAGgl2BCgkoExFpAsc3OlZtTMGka+oaAWAtogBR8gtpHYy1ASrkAk9D20TDWwOOzj8ZKwJdtlqoVPAWP4PbRWAkgyd8+Y9hHYyeAiO3/GPbRDJYSevus0ezAo1rNbi4QgcEZcNk+Y9lHMyhA1T5vwCSWfTRGCxU/sml91vwCj2j20UxMF+unv1NmuaRX/P52m10ODZMS+4SwWc7yCiOYmP9LslAWAgspdcldDI5Tc1+r2VLvRs3W0O1N8cjpFRCjeUlUp4aR9ApwbF6sUcXh+7H+1/QLcGherJG4Xs8/5fBApwDX5sWSKnkmruCJTgFNuMVbad8vL/I9PNEpQKJJEQIpvPi+TacAgijhGZUmH1fz/Ds8wz7YaqMOuQq11V4Oj6RyNbsevWV2wawTjkgtxijf0xKBcBag20yboDssWs++b+MswKbN9BVWJtwFDLWZHsPKhJMAizrJa1iZcBJAVKeGy97DysQEDhCJBfr6BB1W82Pf61kbUyCSFJuuHGELuD+lSLuu6bBa94RVIqBshw9whBL5Vb0c/TbbQv11EpXr2c0VIsMW0HPIGzSsTLAsdDiloGMf24SVOFPTfzeixnqCzk2BJaDrlOIQVvPhsLrflbzvTLxHTOqU4p8PIoWVCe4aSFvvo4WVCWsB/xVvUcPKhFstFKCzioJO08PTmhMn/vIHrIXuDUaICMIAAAAASUVORK5CYII=",
+};
+
 // ===== i18n =====
 const HANCHUESS_I18N = {
   en: {
@@ -26,6 +32,9 @@ const HANCHUESS_I18N = {
     no_change: "No changes",
     unknown_error: "Unknown error",
     duration_range: "Duration must be 1~1440 min",
+    time_overlap: "Charging and discharging time slots overlap, please check",
+    remain_charging: "Remaining charging time",
+    remain_discharging: "Remaining discharging time",
     cmd_sent: "Command sent",
     fail_prefix: "Failed: ",
     stopping: "Stopping...",
@@ -64,6 +73,9 @@ const HANCHUESS_I18N = {
     no_change: "没有修改",
     unknown_error: "未知错误",
     duration_range: "时长需在 1~1440 分钟之间",
+    time_overlap: "充电与放电时间段存在重叠，请检查",
+    remain_charging: "剩余充电时间",
+    remain_discharging: "剩余放电时间",
     cmd_sent: "指令已发送",
     fail_prefix: "失败: ",
     stopping: "停止中...",
@@ -159,6 +171,7 @@ class HanchuessEnergyCard extends HTMLElement {
     this._rendered = false;
     this._originalValues = {};
     this._dataLoaded = false;
+    this._localStartTime = 0;
   }
 
   static getConfigElement() {
@@ -204,24 +217,43 @@ class HanchuessEnergyCard extends HTMLElement {
         .quick-status.error { color: var(--error-color); }
         .quick-status.success { color: var(--success-color, #4caf50); }
         .quick-running {
-          background: var(--card-background-color); border: 1px solid var(--divider-color);
           border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;
-          display: none; flex-direction: column; gap: 6px;
+          display: none; flex-direction: column; gap: 10px;
+        }
+        .quick-running .running-top {
+          display: flex; align-items: center; justify-content: space-between;
         }
         .quick-running .stop-row {
-          display: flex; align-items: center; gap: 8px; cursor: pointer;
+          display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+          padding: 6px 14px; border-radius: 20px;
+          background: rgba(0, 188, 212, 0.12);
+          border: 1px solid transparent;
+          transition: background 0.2s, border-color 0.2s;
+        }
+        .quick-running .stop-row:hover {
+          background: transparent;
+          border-color: #00bcd4;
         }
         .quick-running .stop-row .stop-icon {
-          width: 20px; height: 20px; flex-shrink: 0;
+          width: 16px; height: 16px; flex-shrink: 0;
         }
         .quick-running .stop-row .stop-label {
-          font-size: 14px; font-weight: 500; color: var(--primary-text-color);
+          font-size: 13px; font-weight: 500; color: #00bcd4; white-space: nowrap;
+        }
+        .quick-running .status-badge {
+          display: flex; align-items: center; gap: 6px;
+        }
+        .quick-running .status-badge img {
+          width: 24px; height: 24px;
+        }
+        .quick-running .status-badge .status-text {
+          font-size: 13px; font-weight: 500; color: #00bcd4;
         }
         .quick-running .remain-info {
           font-size: 13px; color: var(--secondary-text-color);
         }
         .quick-running .remain-time {
-          font-size: 20px; font-weight: 600; color: var(--primary-color);
+          font-size: 22px; font-weight: 700; color: var(--primary-color);
         }
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .title { font-size: 18px; font-weight: 500; }
@@ -302,11 +334,17 @@ class HanchuessEnergyCard extends HTMLElement {
             <input type="number" id="quick_duration" min="1" max="1440" value="30" placeholder="1~1440">
           </div>
           <div class="quick-running" id="quick_running">
-            <div class="stop-row" id="quick_stop_btn">
-              <svg class="stop-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="none" stroke="var(--primary-color)" stroke-width="2"/><rect x="7" y="7" width="10" height="10" rx="1" fill="var(--primary-color)"/></svg>
-              <span class="stop-label" id="quick_stop_label"></span>
+            <div class="running-top">
+              <div class="stop-row" id="quick_stop_btn">
+                <svg class="stop-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="none" stroke="#00bcd4" stroke-width="2"/><rect x="7" y="7" width="10" height="10" rx="1" fill="#00bcd4"/></svg>
+                <span class="stop-label" id="quick_stop_label"></span>
+              </div>
+              <div class="status-badge">
+                <img id="quick_status_icon" src="" alt="">
+                <span class="status-text" id="quick_remain_label"></span>
+              </div>
             </div>
-            <div class="remain-info" id="quick_remain_label"></div>
+            <div class="remain-info" id="quick_remain_desc"></div>
             <div class="remain-time" id="quick_remain_time"></div>
           </div>
           <div class="quick-btns" id="quick_btns">
@@ -354,6 +392,13 @@ class HanchuessEnergyCard extends HTMLElement {
     this.shadowRoot.getElementById("quick_stop_btn").addEventListener("click", () => {
       this._quickStop();
     });
+
+    // Save time input value before user edits, for overlap revert
+    this.shadowRoot.getElementById("dynamic_fields").addEventListener("focusin", (e) => {
+      if (e.target.matches("[data-time-group] input[type='time']")) {
+        e.target._prevValue = e.target.value;
+      }
+    });
   }
 
   _updateStatus() {
@@ -389,7 +434,20 @@ class HanchuessEnergyCard extends HTMLElement {
       this._forceStopped = false;
       if (serverRemain > 0 && (fastStatus === 1 || fastStatus === 2)) {
         this._localRemainSec = serverRemain;
-        this._localFastStatus = fastStatus;
+        // Do NOT restore _localFastStatus from server here.
+        // _localFastStatus is only set locally (on start/stop), so when it
+        // reaches 0 the isRunning fallback uses raw fastStatus from the server.
+        // If we re-set it here, fastStatus=0 from the server can never clear it.
+      } else if (this._localFastStatus && fastStatus !== 1 && fastStatus !== 2) {
+        // Server says not running. Only trust this once the 30s grace period
+        // has passed (device needs time to process the command before the server
+        // reflects the new state). After 30s the server is authoritative.
+        if (!this._localStartTime || Date.now() - this._localStartTime > 30000) {
+          this._localFastStatus = 0;
+          this._localRemainSec = 0;
+          this._localStartTime = 0;
+          if (this._localCountdown) { clearInterval(this._localCountdown); this._localCountdown = null; }
+        }
       }
     }
 
@@ -400,11 +458,18 @@ class HanchuessEnergyCard extends HTMLElement {
 
     if (isRunning && quickRunning) {
       const stopLabel = this.shadowRoot.getElementById("quick_stop_label");
+      const statusIcon = this.shadowRoot.getElementById("quick_status_icon");
       const remainLabel = this.shadowRoot.getElementById("quick_remain_label");
+      const remainDesc = this.shadowRoot.getElementById("quick_remain_desc");
       const remainTime = this.shadowRoot.getElementById("quick_remain_time");
       const isChg = curStatus === 1;
       if (stopLabel) stopLabel.textContent = isChg ? `${_t(this._hass, 'stop')} ${_t(this._hass, 'charge')}` : `${_t(this._hass, 'stop')} ${_t(this._hass, 'discharge')}`;
-      if (remainLabel) remainLabel.textContent = isChg ? `${_t(this._hass, 'remaining')} ${_t(this._hass, 'fast_charging')}...` : `${_t(this._hass, 'remaining')} ${_t(this._hass, 'fast_discharging')}...`;
+      if (statusIcon) statusIcon.src = isChg ? HANCHUESS_ICONS.charging : HANCHUESS_ICONS.discharging;
+      if (remainLabel) {
+        remainLabel.textContent = isChg ? _t(this._hass, 'fast_charging') : _t(this._hass, 'fast_discharging');
+        remainLabel.style.color = isChg ? "#00bcd4" : "#4caf50";
+      }
+      if (remainDesc) remainDesc.textContent = isChg ? _t(this._hass, 'remain_charging') : _t(this._hass, 'remain_discharging');
       if (remainTime) remainTime.textContent = `${remainMin}min`;
       quickRunning.style.display = "flex";
       if (quickBtns) quickBtns.style.display = "none";
@@ -527,7 +592,16 @@ class HanchuessEnergyCard extends HTMLElement {
           if (arrow) arrow.classList.remove("open");
         }
       }
+
+      // Real-time overlap check for time inputs in chg/dschg groups
+      const timeInput = e.target.closest("[data-time-group]") && e.target.matches("input[type='time']") ? e.target : null;
+      if (timeInput) {
+        if (this._checkTimeOverlap()) {
+          timeInput.value = timeInput._prevValue || timeInput.value;
+        }
+      }
     };
+
     return true;
   }
 
@@ -966,6 +1040,58 @@ class HanchuessEnergyCard extends HTMLElement {
     setTimeout(() => { statusMsg.textContent = ""; }, 3000);
   }
 
+  // Returns array of {start, end} in minutes (0~1439) for all visible slots in a group
+  _getVisibleTimeSlots(group) {
+    const container = this.shadowRoot.getElementById("dynamic_fields");
+    if (!container) return [];
+    const slots = [];
+    container.querySelectorAll(`[data-time-group="${group}"]`).forEach(slot => {
+      if (!slot.classList.contains("visible") || slot.dataset.timeHidden === "true") return;
+      const inputs = slot.querySelectorAll("input[type='time']");
+      if (inputs.length < 2) return;
+      const startStr = inputs[0].value;
+      const endStr = inputs[1].value;
+      if (!startStr || !endStr) return;
+      const toMin = (t) => {
+        const [h, m] = t.split(":").map(Number);
+        return h * 60 + m;
+      };
+      const start = toMin(startStr);
+      const end = toMin(endStr);
+      // Treat 00:00-00:00 as not set
+      if (start === 0 && end === 0) return;
+      slots.push({ start, end });
+    });
+    return slots;
+  }
+
+  // Returns true if two time intervals overlap (handles overnight wrap-around)
+  _intervalsOverlap(a, b) {
+    // Each interval can wrap midnight: if start > end, it spans midnight
+    const ranges = (iv) => iv.start <= iv.end
+      ? [[iv.start, iv.end]]
+      : [[iv.start, 1439], [0, iv.end]];
+    for (const ra of ranges(a)) {
+      for (const rb of ranges(b)) {
+        // Overlap: not (ra ends before rb starts, or rb ends before ra starts)
+        if (ra[0] <= rb[1] && rb[0] <= ra[1]) return true;
+      }
+    }
+    return false;
+  }
+
+  // Returns true if any chg slot overlaps with any dschg slot
+  _checkTimeOverlap() {
+    const chgSlots = this._getVisibleTimeSlots("chg");
+    const dschgSlots = this._getVisibleTimeSlots("dschg");
+    for (const c of chgSlots) {
+      for (const d of dschgSlots) {
+        if (this._intervalsOverlap(c, d)) return true;
+      }
+    }
+    return false;
+  }
+
   async _submit() {
     const submitBtn = this.shadowRoot.getElementById("submit_btn");
     const statusMsg = this.shadowRoot.getElementById("status_msg");
@@ -978,6 +1104,15 @@ class HanchuessEnergyCard extends HTMLElement {
 
     const sn = this._config.sn;
     const valueMap = {};
+
+    // Check charging/discharging time overlap before submitting
+    if (this._checkTimeOverlap()) {
+      statusMsg.textContent = _t(this._hass, 'time_overlap');
+      statusMsg.className = "status error";
+      submitBtn.disabled = false;
+      setTimeout(() => { statusMsg.textContent = ""; }, 4000);
+      return;
+    }
 
     // Check work mode change
     const wmOptions = state.attributes.work_mode_options || [];
@@ -1193,6 +1328,16 @@ class HanchuessEnergyCard extends HTMLElement {
     if (newStr !== JSON.stringify(origCycle)) targetMap["FLAG_ENABLE_CYCLE"] = newStr;
   }
 
+  // Reset the coordinator's polling cycle so the next data refresh happens
+  // ~60s from now (when the device will have reported accurate state).
+  // Calling update_entity triggers async_request_refresh() on the coordinator,
+  // which resets its internal 60s timer from this moment.
+  _resetCoordinatorCycle() {
+    try {
+      this._hass.callService("homeassistant", "update_entity", { entity_id: this._config.entity });
+    } catch (e) { /* best-effort */ }
+  }
+
   async _quickChargeDischarge() {
     const statusEl = this.shadowRoot.getElementById("quick_status");
     const confirmBtn = this.shadowRoot.getElementById("quick_confirm");
@@ -1220,18 +1365,21 @@ class HanchuessEnergyCard extends HTMLElement {
       this._forceStopped = false;
       this._localFastStatus = Number(mode) === 2 ? 1 : 2;
       this._localRemainSec = Number(duration) * 60;
+      this._localStartTime = Date.now();
       if (this._localCountdown) clearInterval(this._localCountdown);
       this._localCountdown = setInterval(() => {
         this._localRemainSec -= 60;
         if (this._localRemainSec <= 0) {
           this._localRemainSec = 0;
           this._localFastStatus = 0;
+          this._localStartTime = 0;
           clearInterval(this._localCountdown);
           this._localCountdown = null;
         }
         this._updateStatus();
       }, 60000);
       this._updateStatus();
+      this._resetCoordinatorCycle();
     } catch (err) {
       statusEl.textContent = _t(this._hass, 'fail_prefix') + (err.message || _t(this._hass, 'unknown_error'));
       statusEl.className = "quick-status error";
@@ -1258,9 +1406,11 @@ class HanchuessEnergyCard extends HTMLElement {
       });
       this._localFastStatus = 0;
       this._localRemainSec = 0;
+      this._localStartTime = 0;
       this._forceStopped = true;
       if (this._localCountdown) { clearInterval(this._localCountdown); this._localCountdown = null; }
       this._updateStatus();
+      this._resetCoordinatorCycle();
       statusEl.textContent = _t(this._hass, 'stopped');
       statusEl.className = "quick-status success";
     } catch (err) {

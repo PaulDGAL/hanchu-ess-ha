@@ -33,6 +33,7 @@ const HANCHUESS_I18N = {
     unknown_error: "Unknown error",
     duration_range: "Duration must be 1~1440 min",
     time_overlap: "Charging and discharging time slots overlap, please check",
+    time_overlap_hint: "Union not allowed between time periods",
     remain_charging: "Remaining charging time",
     remain_discharging: "Remaining discharging time",
     cmd_sent: "Command sent",
@@ -78,6 +79,7 @@ const HANCHUESS_I18N = {
     unknown_error: "未知错误",
     duration_range: "时长需在 1~1440 分钟之间",
     time_overlap: "充电与放电时间段存在重叠，请检查",
+    time_overlap_hint: "时间段之间不允许合并",
     remain_charging: "剩余充电时间",
     remain_discharging: "剩余放电时间",
     cmd_sent: "指令已发送",
@@ -294,6 +296,7 @@ class HanchuessEnergyCard extends HTMLElement {
         .time-row input { width: 60px; padding: 6px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); font-size: 14px; text-align: center; box-sizing: border-box; cursor: pointer; }
         .time-row span { color: var(--secondary-text-color); }
         .time-row .time-label { font-size: 13px; color: var(--secondary-text-color); min-width: 60px; }
+        .time-overlap-hint { font-size: 12px; color: var(--error-color, #db4437); margin-top: 2px; padding-left: 2px; }
         /* 自定义时间选择器样式 */
         .time-picker-overlay {
           position: fixed;
@@ -1614,9 +1617,9 @@ class HanchuessEnergyCard extends HTMLElement {
 
   // 时间选择器方法
 
-  _showTimePicker(timeInput) {
-    // If clicking end time in a time-row, always start with start time first
-    if (timeInput.dataset.timeType === "end") {
+  _showTimePicker(timeInput, skipRedirect) {
+    // If clicking end time, redirect to start time first (but not for auto-advance)
+    if (!skipRedirect && timeInput.dataset.timeType === "end") {
       const timeRow = timeInput.closest(".time-row");
       if (timeRow) {
         const startInput = timeRow.querySelector("[data-time-type='start']");
@@ -1709,9 +1712,11 @@ class HanchuessEnergyCard extends HTMLElement {
       input.value = prevValue;
       input._prevValue = prevValue;
       this._hideTimePicker();
-      this._showOverlapError();
+      this._showOverlapError(input);
       return;
     }
+    // Clear any previous overlap hint on this row
+    this._clearOverlapHint(input);
 
     input._prevValue = formattedTime;
     input.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1724,7 +1729,7 @@ class HanchuessEnergyCard extends HTMLElement {
       if (timeRow) {
         const endInput = timeRow.querySelector("[data-time-type='end']");
         if (endInput) {
-          setTimeout(() => this._showTimePicker(endInput), 200);
+          setTimeout(() => this._showTimePicker(endInput, true), 200);
         }
       } else {
         // In collapse layout: find end time in same collapse body
@@ -1732,19 +1737,40 @@ class HanchuessEnergyCard extends HTMLElement {
         if (collapseBody) {
           const endInput = collapseBody.querySelector("[data-time-type='end']");
           if (endInput) {
-            setTimeout(() => this._showTimePicker(endInput), 200);
+            setTimeout(() => this._showTimePicker(endInput, true), 200);
           }
         }
       }
     }
   }
 
-  _showOverlapError() {
+  _showOverlapError(input) {
+    // Show hint below the time row
+    const timeRow = input ? input.closest(".time-row") : null;
+    if (timeRow) {
+      // Remove any existing hint
+      const old = timeRow.parentNode.querySelector(".time-overlap-hint");
+      if (old) old.remove();
+      const hint = document.createElement("div");
+      hint.className = "time-overlap-hint";
+      hint.textContent = _t(this._hass, 'time_overlap_hint');
+      timeRow.parentNode.insertBefore(hint, timeRow.nextSibling);
+      setTimeout(() => { if (hint.parentNode) hint.remove(); }, 4000);
+    }
+    // Also show status message at bottom
     const statusMsg = this.shadowRoot.getElementById("status_msg");
     if (statusMsg) {
       statusMsg.textContent = _t(this._hass, 'time_overlap');
       statusMsg.className = "status error";
       setTimeout(() => { statusMsg.textContent = ""; }, 4000);
+    }
+  }
+
+  _clearOverlapHint(input) {
+    const timeRow = input ? input.closest(".time-row") : null;
+    if (timeRow) {
+      const hint = timeRow.parentNode.querySelector(".time-overlap-hint");
+      if (hint) hint.remove();
     }
   }
 

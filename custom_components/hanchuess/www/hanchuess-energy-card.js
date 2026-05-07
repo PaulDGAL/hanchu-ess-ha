@@ -1649,19 +1649,13 @@ class HanchuessEnergyCard extends HTMLElement {
     const currentValue = timeInput.value || "00:00";
     const [hour, minute] = currentValue.split(":").map(Number);
 
-    // Highlight and scroll to selected hour
+    // Highlight selected hour and minute
     hourCol.querySelectorAll(".time-picker-item").forEach(item => {
       item.classList.toggle("selected", parseInt(item.dataset.value) === (hour || 0));
     });
-    const selHourItem = hourCol.querySelector(`.time-picker-item[data-value="${hour || 0}"]`);
-    if (selHourItem) selHourItem.scrollIntoView({ block: "center" });
-
-    // Highlight and scroll to selected minute
     minuteCol.querySelectorAll(".time-picker-item").forEach(item => {
       item.classList.toggle("selected", parseInt(item.dataset.value) === (minute || 0));
     });
-    const selMinItem = minuteCol.querySelector(`.time-picker-item[data-value="${minute || 0}"]`);
-    if (selMinItem) selMinItem.scrollIntoView({ block: "center" });
 
     // Set title based on time type
     const timeType = timeInput.dataset.timeType;
@@ -1678,9 +1672,17 @@ class HanchuessEnergyCard extends HTMLElement {
     // Save original value for rollback
     timeInput._prevValue = currentValue;
 
-    // Show picker
+    // Show picker first, then scroll to selected values
     this.shadowRoot.getElementById("time_picker_overlay").style.display = "block";
     this.shadowRoot.getElementById("time_picker_dialog").style.display = "block";
+
+    // Scroll after display is visible
+    requestAnimationFrame(() => {
+      const selHourItem = hourCol.querySelector(".time-picker-item.selected");
+      if (selHourItem) selHourItem.scrollIntoView({ block: "center" });
+      const selMinItem = minuteCol.querySelector(".time-picker-item.selected");
+      if (selMinItem) selMinItem.scrollIntoView({ block: "center" });
+    });
   }
 
   _hideTimePicker() {
@@ -1708,15 +1710,21 @@ class HanchuessEnergyCard extends HTMLElement {
     // Check overlap
     const hadOverlapBefore = this._checkTimeOverlapWith(input, prevValue);
     const hasOverlapNow = this._checkTimeOverlap();
-    if (!hadOverlapBefore && hasOverlapNow) {
-      input.value = prevValue;
-      input._prevValue = prevValue;
-      this._hideTimePicker();
-      this._showOverlapError(input);
-      return;
+    if (hasOverlapNow) {
+      // Always show hint when overlap exists after change
+      this._showOverlapHint(input);
+      if (!hadOverlapBefore) {
+        // This change introduced a new overlap — revert
+        input.value = prevValue;
+        input._prevValue = prevValue;
+        this._hideTimePicker();
+        return;
+      }
+      // Pre-existing overlap — allow edit (user may be fixing it), but show hint
+    } else {
+      // No overlap — clear any previous hint
+      this._clearOverlapHint(input);
     }
-    // Clear any previous overlap hint on this row
-    this._clearOverlapHint(input);
 
     input._prevValue = formattedTime;
     input.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1744,20 +1752,23 @@ class HanchuessEnergyCard extends HTMLElement {
     }
   }
 
-  _showOverlapError(input) {
-    // Show hint below the time row
-    const timeRow = input ? input.closest(".time-row") : null;
-    if (timeRow) {
-      // Remove any existing hint
-      const old = timeRow.parentNode.querySelector(".time-overlap-hint");
+  _showOverlapHint(input) {
+    // Show hint below the time row / collapse-row (lightweight, does not revert value)
+    const row = input ? (input.closest(".time-row") || input.closest(".collapse-row")) : null;
+    if (row) {
+      const old = row.parentNode.querySelector(".time-overlap-hint");
       if (old) old.remove();
       const hint = document.createElement("div");
       hint.className = "time-overlap-hint";
       hint.textContent = _t(this._hass, 'time_overlap_hint');
-      timeRow.parentNode.insertBefore(hint, timeRow.nextSibling);
+      row.parentNode.insertBefore(hint, row.nextSibling);
       setTimeout(() => { if (hint.parentNode) hint.remove(); }, 4000);
     }
-    // Also show status message at bottom
+  }
+
+  _showOverlapError(input) {
+    // Show hint below the time row / collapse-row + bottom status message
+    this._showOverlapHint(input);
     const statusMsg = this.shadowRoot.getElementById("status_msg");
     if (statusMsg) {
       statusMsg.textContent = _t(this._hass, 'time_overlap');
@@ -1767,9 +1778,9 @@ class HanchuessEnergyCard extends HTMLElement {
   }
 
   _clearOverlapHint(input) {
-    const timeRow = input ? input.closest(".time-row") : null;
-    if (timeRow) {
-      const hint = timeRow.parentNode.querySelector(".time-overlap-hint");
+    const row = input ? (input.closest(".time-row") || input.closest(".collapse-row")) : null;
+    if (row) {
+      const hint = row.parentNode.querySelector(".time-overlap-hint");
       if (hint) hint.remove();
     }
   }

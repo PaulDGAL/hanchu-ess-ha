@@ -42,10 +42,14 @@ const HANCHUESS_I18N = {
     apply: "Apply",
     fast_charging: "Charging",
     fast_discharging: "Discharging",
-    remaining: "remaining",
     quick_tip: "To ensure optimal performance and safety, please do not change any control settings or perform OTA updates during fast charging or discharging.",
     card_name: "Hanchuess Remote Settings",
     card_desc: "Hanchuess device remote settings card",
+    select_time: "Select Time",
+    select_start_time: "Select Start Time",
+    select_end_time: "Select End Time",
+    hour_label: "Hour (00-23)",
+    minute_label: "Minute (00-59)",
   },
   "zh-Hans": {
     device: "设备",
@@ -83,10 +87,14 @@ const HANCHUESS_I18N = {
     apply: "是否应用",
     fast_charging: "充电中",
     fast_discharging: "放电中",
-    remaining: "剩余",
     quick_tip: "为确保最佳性能和安全，快速充放电期间请勿修改任何控制设置或执行OTA升级。",
     card_name: "Hanchuess 远程设置",
     card_desc: "Hanchuess 设备远程设置卡片",
+    select_time: "选择时间",
+    select_start_time: "选择开始时间",
+    select_end_time: "选择结束时间",
+    hour_label: "小时 (00-23)",
+    minute_label: "分钟 (00-59)",
   },
 };
 
@@ -304,48 +312,92 @@ class HanchuessEnergyCard extends HTMLElement {
           transform: translate(-50%, -50%);
           background: var(--card-background-color);
           border-radius: 8px;
-          padding: 20px;
+          padding: 16px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.2);
           z-index: 1001;
-          min-width: 300px;
+          min-width: 260px;
+          max-width: 320px;
         }
         .time-picker-header {
           font-size: 16px;
           font-weight: 500;
-          margin-bottom: 16px;
+          margin-bottom: 10px;
           text-align: center;
           color: var(--primary-text-color);
         }
         .time-picker-body {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 8px;
+        }
+        .time-picker-section {
+          border: 1px solid var(--divider-color);
+          border-radius: 6px;
+          padding: 8px 10px 6px;
+        }
+        .time-picker-section-title {
+          font-size: 12px;
+          font-weight: 500;
+          color: var(--primary-color);
+          margin-bottom: 6px;
+          text-align: center;
         }
         .time-picker-row {
           display: flex;
-          align-items: center;
-          gap: 8px;
+          flex-direction: column;
+          gap: 4px;
         }
         .time-picker-label {
-          min-width: 80px;
-          font-size: 14px;
+          font-size: 13px;
           color: var(--secondary-text-color);
-        }
-        .time-picker-input {
-          flex: 1;
-          padding: 8px;
-          border: 1px solid var(--divider-color);
-          border-radius: 4px;
-          background: var(--card-background-color);
-          color: var(--primary-text-color);
-          font-size: 16px;
           text-align: center;
+        }
+        .time-picker-slider-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .time-picker-slider-label {
+          font-size: 14px;
+          color: var(--primary-text-color);
+          min-width: 30px;
+          text-align: center;
+          font-variant-numeric: tabular-nums;
+        }
+        .time-picker-slider {
+          flex: 1;
+          height: 6px;
+          -webkit-appearance: none;
+          appearance: none;
+          background: var(--divider-color);
+          border-radius: 3px;
+          outline: none;
+        }
+        .time-picker-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: var(--primary-color);
+          cursor: pointer;
+          border: 2px solid var(--card-background-color);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .time-picker-slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: var(--primary-color);
+          cursor: pointer;
+          border: 2px solid var(--card-background-color);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .time-picker-buttons {
           display: flex;
           gap: 8px;
           justify-content: flex-end;
-          margin-top: 16px;
+          margin-top: 10px;
         }
         .time-picker-btn {
           padding: 8px 16px;
@@ -362,6 +414,10 @@ class HanchuessEnergyCard extends HTMLElement {
           background: var(--secondary-background-color);
           color: var(--secondary-text-color);
         }
+        .time-picker-single .time-picker-section {
+          border: none;
+          padding: 0;
+        }
         .icon-btn {
           background: none; border: none; cursor: pointer; font-size: 18px; padding: 4px;
           color: var(--secondary-text-color); line-height: 1;
@@ -371,7 +427,6 @@ class HanchuessEnergyCard extends HTMLElement {
         .icon-btn.del { color: var(--error-color, #db4437); }
         .dynamic-field { display: none; }
         .dynamic-field.visible { display: block; }
-        .section-title { font-size: 14px; font-weight: 500; margin: 16px 0 8px; color: var(--primary-color); }
         .status { font-size: 12px; color: var(--secondary-text-color); margin-top: 8px; text-align: center; }
         .status.error { color: var(--error-color); }
         .status.success { color: var(--success-color, #4caf50); }
@@ -454,15 +509,43 @@ class HanchuessEnergyCard extends HTMLElement {
         <!-- 自定义时间选择器 -->
         <div class="time-picker-overlay" id="time_picker_overlay"></div>
         <div class="time-picker-dialog" id="time_picker_dialog" style="display:none">
-          <div class="time-picker-header" id="time_picker_title">选择时间</div>
+          <div class="time-picker-header" id="time_picker_title">${_t(this._hass, 'select_time')}</div>
           <div class="time-picker-body">
-            <div class="time-picker-row">
-              <span class="time-picker-label">小时</span>
-              <input type="number" class="time-picker-input" id="time_picker_hour" min="0" max="23" value="0">
+            <!-- 开始时间 -->
+            <div class="time-picker-section" id="start_section">
+              <div class="time-picker-section-title">${_t(this._hass, 'select_start_time')}</div>
+              <div class="time-picker-row">
+                <div class="time-picker-label">${_t(this._hass, 'hour_label')}</div>
+                <div class="time-picker-slider-container">
+                  <span class="time-picker-slider-label" id="start_hour_label">00</span>
+                  <input type="range" class="time-picker-slider" id="start_hour_slider" min="0" max="23" value="0" step="1">
+                </div>
+              </div>
+              <div class="time-picker-row">
+                <div class="time-picker-label">${_t(this._hass, 'minute_label')}</div>
+                <div class="time-picker-slider-container">
+                  <span class="time-picker-slider-label" id="start_minute_label">00</span>
+                  <input type="range" class="time-picker-slider" id="start_minute_slider" min="0" max="59" value="0" step="1">
+                </div>
+              </div>
             </div>
-            <div class="time-picker-row">
-              <span class="time-picker-label">分钟</span>
-              <input type="number" class="time-picker-input" id="time_picker_minute" min="0" max="59" value="0">
+            <!-- 结束时间 -->
+            <div class="time-picker-section" id="end_section">
+              <div class="time-picker-section-title">${_t(this._hass, 'select_end_time')}</div>
+              <div class="time-picker-row">
+                <div class="time-picker-label">${_t(this._hass, 'hour_label')}</div>
+                <div class="time-picker-slider-container">
+                  <span class="time-picker-slider-label" id="end_hour_label">00</span>
+                  <input type="range" class="time-picker-slider" id="end_hour_slider" min="0" max="23" value="0" step="1">
+                </div>
+              </div>
+              <div class="time-picker-row">
+                <div class="time-picker-label">${_t(this._hass, 'minute_label')}</div>
+                <div class="time-picker-slider-container">
+                  <span class="time-picker-slider-label" id="end_minute_label">00</span>
+                  <input type="range" class="time-picker-slider" id="end_minute_slider" min="0" max="59" value="0" step="1">
+                </div>
+              </div>
             </div>
             <div class="time-picker-buttons">
               <button class="time-picker-btn cancel" id="time_picker_cancel">${_t(this._hass, 'cancel')}</button>
@@ -506,19 +589,68 @@ class HanchuessEnergyCard extends HTMLElement {
       this._confirmTimePicker();
     });
 
-    // 时间输入框点击事件
+    // 开始时间滑块事件监听
+    this.shadowRoot.getElementById("start_hour_slider").addEventListener("input", (e) => {
+      this.shadowRoot.getElementById("start_hour_label").textContent = e.target.value.toString().padStart(2, '0');
+    });
+    this.shadowRoot.getElementById("start_minute_slider").addEventListener("input", (e) => {
+      this.shadowRoot.getElementById("start_minute_label").textContent = e.target.value.toString().padStart(2, '0');
+    });
+
+    // 结束时间滑块事件监听
+    this.shadowRoot.getElementById("end_hour_slider").addEventListener("input", (e) => {
+      this.shadowRoot.getElementById("end_hour_label").textContent = e.target.value.toString().padStart(2, '0');
+    });
+    this.shadowRoot.getElementById("end_minute_slider").addEventListener("input", (e) => {
+      this.shadowRoot.getElementById("end_minute_label").textContent = e.target.value.toString().padStart(2, '0');
+    });
+
+    // 时间输入框点击事件：点击时间行中的任意输入框，打开区间选择器
     this.shadowRoot.addEventListener("click", (e) => {
       if (e.target.classList.contains("time-input")) {
         this._showTimePicker(e.target);
       }
     });
+  }
 
-    // Save time input value before user edits, for overlap revert
-    this.shadowRoot.getElementById("dynamic_fields").addEventListener("focusin", (e) => {
-      if (e.target.matches("[data-time-group] input.time-input")) {
-        e.target._prevValue = e.target.value;
+  // --- localStorage optimistic state helpers ---
+  _fastStateKey() {
+    return `hanchuess_fast_${this._config.sn || ""}`;
+  }
+
+  _saveFastState(status, remainSec) {
+    try {
+      localStorage.setItem(this._fastStateKey(), JSON.stringify({
+        status,
+        remainSec,
+        ts: Date.now(),
+      }));
+    } catch (e) { /* best-effort */ }
+  }
+
+  _loadFastState() {
+    try {
+      const raw = localStorage.getItem(this._fastStateKey());
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      // Expire after remainSec + 5min buffer, or if older than 24h
+      if (!obj.ts || Date.now() - obj.ts > 86400000) {
+        localStorage.removeItem(this._fastStateKey());
+        return null;
       }
-    });
+      // Estimate remaining: elapsed since saved
+      const elapsed = Math.floor((Date.now() - obj.ts) / 1000);
+      const remain = obj.remainSec - elapsed;
+      if (remain <= 0) {
+        localStorage.removeItem(this._fastStateKey());
+        return null;
+      }
+      return { status: obj.status, remainSec: remain };
+    } catch (e) { return null; }
+  }
+
+  _clearFastState() {
+    try { localStorage.removeItem(this._fastStateKey()); } catch (e) { /* best-effort */ }
   }
 
   _updateStatus() {
@@ -547,6 +679,35 @@ class HanchuessEnergyCard extends HTMLElement {
 
     const fastStatus = Number(state.attributes.fast_chg_status || 0);
     const serverRemain = Number(state.attributes.fast_chg_remain || 0);
+
+    // Restore optimistic state from localStorage (survives F5)
+    if (!this._localFastStatus && !this._forceStopped) {
+      const saved = this._loadFastState();
+      if (saved && (saved.status === 1 || saved.status === 2)) {
+        // Only use saved state if server hasn't caught up yet
+        if (fastStatus !== saved.status || serverRemain === 0) {
+          this._localFastStatus = saved.status;
+          this._localRemainSec = saved.remainSec;
+          this._localStartTime = Date.now() - 1000; // approximate
+          // Restart countdown
+          if (this._localCountdown) clearInterval(this._localCountdown);
+          this._localCountdown = setInterval(() => {
+            this._localRemainSec -= 60;
+            if (this._localRemainSec <= 0) {
+              this._localRemainSec = 0;
+              this._localFastStatus = 0;
+              this._localStartTime = 0;
+              this._clearFastState();
+              clearInterval(this._localCountdown);
+              this._localCountdown = null;
+            } else {
+              this._saveFastState(this._localFastStatus, this._localRemainSec);
+            }
+            this._updateStatus();
+          }, 60000);
+        }
+      }
+    }
 
     if (this._forceStopped && (fastStatus === 1 || fastStatus === 2)) {
       // server hasn't caught up yet, treat as idle
@@ -582,8 +743,12 @@ class HanchuessEnergyCard extends HTMLElement {
           this._localFastStatus = 0;
           this._localRemainSec = 0;
           this._localStartTime = 0;
+          this._clearFastState();
           if (this._localCountdown) { clearInterval(this._localCountdown); this._localCountdown = null; }
         }
+      } else if (this._localFastStatus && (fastStatus === 1 || fastStatus === 2)) {
+        // Server has caught up with running state, no longer need optimistic
+        this._clearFastState();
       }
     }
 
@@ -675,6 +840,8 @@ class HanchuessEnergyCard extends HTMLElement {
       if (field.type === "collapse") {
         const children = field.children || [];
         const sig = field.signal;
+        // Determine time group for overlap detection from field code (e.g. TCT_CHG0 -> chg, TCT_DISCHG1 -> dschg)
+        const collapseGroup = field.code && field.code.includes("DISCHG") ? "dschg" : field.code && field.code.includes("CHG") ? "chg" : "";
         let switchHtml = "";
         let bodyHtml = "";
         for (const c of children) {
@@ -683,7 +850,9 @@ class HanchuessEnergyCard extends HTMLElement {
             const opts = (c.options||[]).map(o => `<option value="${o.value}">${o.name}</option>`).join("");
             bodyHtml += `<div class="collapse-row"><label><span class="req">*</span>${c.name}</label><select data-arr-signal="${sig}" data-arr-index="${ci}">${opts}</select></div>`;
           } else if (c.type === "5") {
-            bodyHtml += `<div class="collapse-row"><label><span class="req">*</span>${c.name}</label><input type="text" class="time-input" data-arr-signal="${sig}" data-arr-index="${ci}" data-arr-fmt="time" readonly></div>`;
+            const timeTypeAttr = c.code === "start_time" ? 'data-time-type="start"' : c.code === "end_time" ? 'data-time-type="end"' : "";
+            const groupAttr = collapseGroup ? `data-time-group="${collapseGroup}"` : "";
+            bodyHtml += `<div class="collapse-row"><label><span class="req">*</span>${c.name}</label><input type="text" class="time-input" data-arr-signal="${sig}" data-arr-index="${ci}" data-arr-fmt="time" ${timeTypeAttr} ${groupAttr} readonly></div>`;
           } else if (c.type === "1") {
             const mn = c.min||"0", mx = c.max||"99999", cStep = c.step||1;
             bodyHtml += `<div class="collapse-row"><label><span class="req">*</span>${c.name}</label><input type="number" data-arr-signal="${sig}" data-arr-index="${ci}" data-step="${cStep}" min="${mn}" max="${mx}" step="${cStep}" placeholder="[${mn}, ${mx}]"></div>`;
@@ -691,7 +860,8 @@ class HanchuessEnergyCard extends HTMLElement {
         }
         // "是否应用" from FLAG_ENABLE_CYCLE, not from array
         switchHtml = `<span class="collapse-sw-label">${_t(this._hass, 'apply')}</span><label class="toggle"><input type="checkbox" data-enable-signal="${field.code}" data-collapse-switch="${field.code}"><span class="slider"></span></label>`;
-        html += `<div class="${cls}" ${la} data-signal="${sig}" data-collapse="${field.code}"><div class="collapse-card"><div class="collapse-header"><span class="collapse-arrow" data-arrow="${field.code}" data-toggle="${field.code}">▶</span><span class="collapse-title" data-toggle="${field.code}">${field.name}</span>${switchHtml}</div><div class="collapse-body" data-body="${field.code}">${bodyHtml}</div></div></div>`;
+        const collapseGroupAttr = collapseGroup ? `data-time-group="${collapseGroup}"` : "";
+        html += `<div class="${cls}" ${la} data-signal="${sig}" data-collapse="${field.code}" ${collapseGroupAttr}><div class="collapse-card"><div class="collapse-header"><span class="collapse-arrow" data-arrow="${field.code}" data-toggle="${field.code}">▶</span><span class="collapse-title" data-toggle="${field.code}">${field.name}</span>${switchHtml}</div><div class="collapse-body" data-body="${field.code}">${bodyHtml}</div></div></div>`;
       }
     }
 
@@ -730,39 +900,12 @@ class HanchuessEnergyCard extends HTMLElement {
         }
       }
 
-      // Real-time overlap check for time inputs in chg/dschg groups.
-      // Only revert if this specific change INTRODUCED a new overlap.
-      // Use setTimeout(0) to defer DOM manipulation until after the native
-      // time picker has fully committed and closed; touching .value
-      // synchronously inside a change handler confuses the picker UI.
-      const timeInput = e.target.closest("[data-time-group]") && e.target.matches("input.time-input") ? e.target : null;
+      // Update _prevValue for time inputs after change.
+      // Overlap check is handled by _confirmTimePicker before the change
+      // event is dispatched, so no need to re-check here.
+      const timeInput = e.target.matches("input.time-input") ? e.target : null;
       if (timeInput) {
-        const newVal = timeInput.value;
-        const prevVal = timeInput._prevValue;
-        if (prevVal !== undefined && prevVal !== newVal) {
-          setTimeout(() => {
-            if (timeInput.value !== newVal) return; // user changed again — skip
-            timeInput.value = prevVal;
-            const hadOverlapBefore = this._checkTimeOverlap();
-            timeInput.value = newVal;
-            if (!hadOverlapBefore && this._checkTimeOverlap()) {
-              // This change introduced a new overlap — revert
-              timeInput.value = prevVal;
-              // 重要：恢复后需要更新_prevValue为恢复后的值
-              timeInput._prevValue = prevVal;
-              // 显示错误提示
-              const statusMsg = this.shadowRoot.getElementById("status_msg");
-              if (statusMsg) {
-                statusMsg.textContent = _t(this._hass, 'time_overlap');
-                statusMsg.className = "status error";
-                setTimeout(() => { statusMsg.textContent = ""; }, 4000);
-              }
-            } else {
-              // No new overlap (or overlap pre-existed) — accept, update saved value
-              timeInput._prevValue = newVal;
-            }
-          }, 0);
-        }
+        timeInput._prevValue = timeInput.value;
       }
     };
 
@@ -821,6 +964,7 @@ class HanchuessEnergyCard extends HTMLElement {
       if (el.classList.contains("time-input") || el.dataset.arrFmt === "time") {
         const s = String(val).padStart(4, "0");
         el.value = s.slice(0,2) + ":" + s.slice(2,4);
+        el._prevValue = el.value;
       } else if (el.tagName === "SELECT") {
         el.value = String(val);
       } else if (el.type === "number" && el.dataset.step) {
@@ -861,7 +1005,7 @@ class HanchuessEnergyCard extends HTMLElement {
 
   _deleteTimeSlot(group, index) {
     const container = this.shadowRoot.getElementById("dynamic_fields");
-    const allSlots = Array.from(container.querySelectorAll(`[data-time-group="${group}"]`));
+    const allSlots = Array.from(container.querySelectorAll(`[data-time-group="${group}"][data-time-index]`));
     
     // Collect all visible slots' values
     const visibleValues = [];
@@ -921,7 +1065,7 @@ class HanchuessEnergyCard extends HTMLElement {
   _addTimeSlot(group, index) {
     const container = this.shadowRoot.getElementById("dynamic_fields");
     // Find next hidden time slot in this group
-    const allSlots = container.querySelectorAll(`[data-time-group="${group}"]`);
+    const allSlots = container.querySelectorAll(`[data-time-group="${group}"][data-time-index]`);
     for (const slot of allSlots) {
       if (slot.dataset.timeHidden === "true" || !slot.classList.contains("visible")) {
         slot.classList.add("visible");
@@ -940,7 +1084,7 @@ class HanchuessEnergyCard extends HTMLElement {
 
   _updateTimeButtons(group) {
     const container = this.shadowRoot.getElementById("dynamic_fields");
-    const allSlots = container.querySelectorAll(`[data-time-group="${group}"]`);
+    const allSlots = container.querySelectorAll(`[data-time-group="${group}"][data-time-index]`);
 
     const visibleSlots = [];
     const hiddenSlots = [];
@@ -1021,9 +1165,9 @@ class HanchuessEnergyCard extends HTMLElement {
       }
     });
 
-    // Update add/delete buttons for time groups
+    // Update add/delete buttons for time groups (only type=6 slots have data-time-index)
     const groups = new Set();
-    container.querySelectorAll("[data-time-group]").forEach(el => {
+    container.querySelectorAll("[data-time-group][data-time-index]").forEach(el => {
       groups.add(el.dataset.timeGroup);
     });
     groups.forEach(g => this._updateTimeButtons(g));
@@ -1093,101 +1237,12 @@ class HanchuessEnergyCard extends HTMLElement {
         }
       }
 
-      // Fill dynamic fields
+      // Fill all dynamic fields (replaces duplicated fill logic)
+      this._fillData(result);
+
+      // Handle time slot visibility (only type=6 slots, which have data-time-index)
       const container = this.shadowRoot.getElementById("dynamic_fields");
-      const inputs = container.querySelectorAll("input[data-signal]");
-      inputs.forEach(input => {
-        const signal = input.dataset.signal;
-        if (signal && result[signal] !== undefined) {
-          if (input.classList.contains("time-input")) {
-            const v = String(result[signal]);
-            if (v.includes(":")) {
-              input.value = v;
-            } else {
-              const fmt = input.closest("[data-time-fmt]")?.dataset.timeFmt || "";
-              if (fmt.includes("HH") || fmt.includes("hh")) {
-                input.value = this._signalToTime(result[signal]);
-              } else {
-                const s = v.padStart(4, "0");
-                input.value = s.slice(0,2) + ":" + s.slice(2,4);
-              }
-            }
-          } else if (input.type === "checkbox") {
-            input.checked = String(result[signal]) === (input.dataset.on || "1");
-          } else if (signal === "MIN_THRESH_CHG_DUR") {
-            input.value = Math.round(Number(result[signal]) / 60);
-          } else if (input.type === "number" && input.dataset.step) {
-            const step = parseFloat(input.dataset.step);
-            const num = Number(result[signal]);
-            input.value = isNaN(num) ? result[signal] : (step < 1 ? parseFloat(num.toFixed(String(step).split(".")[1]?.length || 2)) : Math.round(num));
-          } else {
-            input.value = result[signal];
-          }
-        }
-      });
-
-      // Fill selects in collapse cards
-      container.querySelectorAll("select[data-signal]").forEach(sel => {
-        const signal = sel.dataset.signal;
-        if (signal && result[signal] !== undefined) sel.value = String(result[signal]);
-      });
-
-      // Fill collapse card array fields (82/83)
-      container.querySelectorAll("[data-arr-signal]").forEach(el => {
-        const sig = el.dataset.arrSignal;
-        const idx = parseInt(el.dataset.arrIndex);
-        if (!sig || isNaN(idx) || result[sig] === undefined) return;
-        let arr;
-        try { arr = JSON.parse(result[sig]); } catch { return; }
-        if (!Array.isArray(arr) || idx >= arr.length) return;
-        const val = arr[idx];
-        if (el.type === "checkbox") {
-          el.checked = String(val) === (el.dataset.on || "1");
-        } else if (el.classList.contains("time-input") || el.dataset.arrFmt === "time") {
-          const s = String(val).padStart(4, "0");
-          el.value = s.slice(0,2) + ":" + s.slice(2,4);
-        } else if (el.tagName === "SELECT") {
-          el.value = String(val);
-        } else {
-          if (el.type === "number" && el.dataset.step) {
-            const step = parseFloat(el.dataset.step);
-            const num = Number(val);
-            el.value = isNaN(num) ? val : (step < 1 ? parseFloat(num.toFixed(String(step).split(".")[1]?.length || 2)) : Math.round(num));
-          } else {
-            el.value = String(val).replace(/"/g, "");
-          }
-        }
-      });
-
-      // Fill collapse card expand state from FLAG_ENABLE_CYCLE
-      let enableCycle = [];
-      try { enableCycle = JSON.parse(result["FLAG_ENABLE_CYCLE"] || "[]"); } catch {}
-      container.querySelectorAll("[data-enable-signal]").forEach(sw => {
-        const code = sw.dataset.enableSignal;
-        // TCT_CHG0->0, TCT_CHG1->1, TCT_CHG2->2, TCT_DISCHG0->3...
-        const m = code.match(/TCT_(CHG|DISCHG)(\d)/);
-        if (m && enableCycle.length) {
-          const ci = m[1] === "CHG" ? Number(m[2]) : 3 + Number(m[2]);
-          sw.checked = enableCycle[ci] === 1;
-        }
-      });
-
-      // Handle collapse card expand state based on switch
-      container.querySelectorAll("[data-collapse-switch]").forEach(sw => {
-        const code = sw.dataset.collapseSwitch;
-        const body = container.querySelector(`[data-body="${code}"]`);
-        const arrow = container.querySelector(`[data-arrow="${code}"]`);
-        if (sw.checked) {
-          if (body) body.classList.add("open");
-          if (arrow) arrow.classList.add("open");
-        } else {
-          if (body) body.classList.remove("open");
-          if (arrow) arrow.classList.remove("open");
-        }
-      });
-
-      // Handle time slot visibility
-      const timeSlots = container.querySelectorAll("[data-time-group]");
+      const timeSlots = container.querySelectorAll("[data-time-group][data-time-index]");
       timeSlots.forEach(slot => {
         const timeInputs = slot.querySelectorAll("input.time-input");
         const allZero = Array.from(timeInputs).every(inp => inp.value === "00:00");
@@ -1219,17 +1274,31 @@ class HanchuessEnergyCard extends HTMLElement {
     const container = this.shadowRoot.getElementById("dynamic_fields");
     if (!container) return [];
     const slots = [];
+    const toMin = (t) => {
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    };
     container.querySelectorAll(`[data-time-group="${group}"]`).forEach(slot => {
       if (!slot.classList.contains("visible") || slot.dataset.timeHidden === "true") return;
+      // Skip collapse cards whose enable switch is off
+      const collapseSwitch = slot.querySelector("[data-collapse-switch]");
+      if (collapseSwitch && !collapseSwitch.checked) return;
+
       const inputs = slot.querySelectorAll("input.time-input");
       if (inputs.length < 2) return;
-      const startStr = inputs[0].value;
-      const endStr = inputs[1].value;
+
+      // Use data-time-type to identify start/end, fall back to DOM order
+      let startInput = null, endInput = null;
+      inputs.forEach(inp => {
+        if (inp.dataset.timeType === "start") startInput = inp;
+        else if (inp.dataset.timeType === "end") endInput = inp;
+      });
+      if (!startInput) startInput = inputs[0];
+      if (!endInput) endInput = inputs[1];
+
+      const startStr = startInput.value;
+      const endStr = endInput.value;
       if (!startStr || !endStr) return;
-      const toMin = (t) => {
-        const [h, m] = t.split(":").map(Number);
-        return h * 60 + m;
-      };
       const start = toMin(startStr);
       const end = toMin(endStr);
       // Treat 00:00-00:00 as not set
@@ -1344,8 +1413,8 @@ class HanchuessEnergyCard extends HTMLElement {
       });
     });
 
-    // Also check deleted time slots (hidden but were visible before)
-    const allTimeSlots = container.querySelectorAll("[data-time-group]");
+    // Also check deleted time slots (hidden but were visible before, only type=6)
+    const allTimeSlots = container.querySelectorAll("[data-time-group][data-time-index]");
     allTimeSlots.forEach(slot => {
       if (slot.dataset.timeHidden === "true") {
         const inputs = slot.querySelectorAll("input.time-input");
@@ -1540,6 +1609,7 @@ class HanchuessEnergyCard extends HTMLElement {
       this._localFastStatus = Number(mode) === 2 ? 1 : 2;
       this._localRemainSec = Number(duration) * 60;
       this._localStartTime = Date.now();
+      this._saveFastState(this._localFastStatus, this._localRemainSec);
       if (this._localCountdown) clearInterval(this._localCountdown);
       this._localCountdown = setInterval(() => {
         this._localRemainSec -= 60;
@@ -1547,8 +1617,11 @@ class HanchuessEnergyCard extends HTMLElement {
           this._localRemainSec = 0;
           this._localFastStatus = 0;
           this._localStartTime = 0;
+          this._clearFastState();
           clearInterval(this._localCountdown);
           this._localCountdown = null;
+        } else {
+          this._saveFastState(this._localFastStatus, this._localRemainSec);
         }
         this._updateStatus();
       }, 60000);
@@ -1582,6 +1655,7 @@ class HanchuessEnergyCard extends HTMLElement {
       this._localRemainSec = 0;
       this._localStartTime = 0;
       this._forceStopped = true;
+      this._clearFastState();
       if (this._localCountdown) { clearInterval(this._localCountdown); this._localCountdown = null; }
       this._updateStatus();
       this._resetCoordinatorCycle();
@@ -1596,82 +1670,196 @@ class HanchuessEnergyCard extends HTMLElement {
   }
 
   // 时间选择器方法
+
+  // 判断点击的时间输入框是否属于一个有时间区间的 time-row
+  _isRangeInput(timeInput) {
+    const timeRow = timeInput.closest(".time-row");
+    if (!timeRow) return false;
+    return !!timeRow.querySelector("input[data-time-type='start']") &&
+           !!timeRow.querySelector("input[data-time-type='end']");
+  }
+
   _showTimePicker(timeInput) {
+    const dialog = this.shadowRoot.getElementById("time_picker_dialog");
+    const startSection = this.shadowRoot.getElementById("start_section");
+    const endSection = this.shadowRoot.getElementById("end_section");
+    const titleEl = this.shadowRoot.getElementById("time_picker_title");
+
+    const isRange = this._isRangeInput(timeInput);
+
+    // 保存当前时间输入框及配对信息
     this._currentTimeInput = timeInput;
-    
-    // 解析当前时间
-    const currentValue = timeInput.value || "00:00";
-    const [hour, minute] = currentValue.split(":").map(Number);
-    
-    // 设置时间选择器的值
-    this.shadowRoot.getElementById("time_picker_hour").value = hour || 0;
-    this.shadowRoot.getElementById("time_picker_minute").value = minute || 0;
-    
-    // 设置标题
-    const isStart = timeInput.dataset.timeType === "start";
-    const title = this.shadowRoot.getElementById("time_picker_title");
-    if (title) {
-      title.textContent = isStart ? "选择开始时间" : "选择结束时间";
+
+    if (isRange) {
+      // 区间模式：同时显示开始和结束时间
+      const timeRow = timeInput.closest(".time-row");
+      const startInput = timeRow.querySelector("input[data-time-type='start']");
+      const endInput = timeRow.querySelector("input[data-time-type='end']");
+      this._timeRangeInputs = { start: startInput, end: endInput };
+
+      // 保存原始值用于回滚
+      this._timeRangePrevValues = {
+        start: startInput.value || "00:00",
+        end: endInput.value || "00:00",
+      };
+
+      // 解析并设置开始时间滑块
+      const [sH, sM] = (startInput.value || "00:00").split(":").map(Number);
+      this.shadowRoot.getElementById("start_hour_slider").value = sH || 0;
+      this.shadowRoot.getElementById("start_minute_slider").value = sM || 0;
+      this.shadowRoot.getElementById("start_hour_label").textContent = (sH || 0).toString().padStart(2, '0');
+      this.shadowRoot.getElementById("start_minute_label").textContent = (sM || 0).toString().padStart(2, '0');
+
+      // 解析并设置结束时间滑块
+      const [eH, eM] = (endInput.value || "00:00").split(":").map(Number);
+      this.shadowRoot.getElementById("end_hour_slider").value = eH || 0;
+      this.shadowRoot.getElementById("end_minute_slider").value = eM || 0;
+      this.shadowRoot.getElementById("end_hour_label").textContent = (eH || 0).toString().padStart(2, '0');
+      this.shadowRoot.getElementById("end_minute_label").textContent = (eM || 0).toString().padStart(2, '0');
+
+      // 显示两个 section
+      startSection.style.display = "";
+      endSection.style.display = "";
+      dialog.classList.remove("time-picker-single");
+      if (titleEl) titleEl.textContent = _t(this._hass, 'select_time');
+    } else {
+      // 单时间模式（折叠卡片内的单独时间输入）
+      this._timeRangeInputs = null;
+      this._timeRangePrevValues = null;
+
+      const currentValue = timeInput.value || "00:00";
+      const [hour, minute] = currentValue.split(":").map(Number);
+
+      // 只用开始时间滑块（复用为单时间滑块）
+      this.shadowRoot.getElementById("start_hour_slider").value = hour || 0;
+      this.shadowRoot.getElementById("start_minute_slider").value = minute || 0;
+      this.shadowRoot.getElementById("start_hour_label").textContent = (hour || 0).toString().padStart(2, '0');
+      this.shadowRoot.getElementById("start_minute_label").textContent = (minute || 0).toString().padStart(2, '0');
+
+      // 隐藏结束时间 section
+      startSection.style.display = "";
+      endSection.style.display = "none";
+      dialog.classList.add("time-picker-single");
+
+      // 标题
+      const timeType = timeInput.dataset.timeType;
+      if (titleEl) {
+        if (timeType === "start") {
+          titleEl.textContent = _t(this._hass, 'select_start_time');
+        } else if (timeType === "end") {
+          titleEl.textContent = _t(this._hass, 'select_end_time');
+        } else {
+          titleEl.textContent = _t(this._hass, 'select_time');
+        }
+      }
+
+      // 保存原始值
+      timeInput._prevValue = currentValue;
     }
-    
+
     // 显示时间选择器
     this.shadowRoot.getElementById("time_picker_overlay").style.display = "block";
     this.shadowRoot.getElementById("time_picker_dialog").style.display = "block";
-    
-    // 保存原始值用于回滚
-    timeInput._prevValue = currentValue;
   }
 
   _hideTimePicker() {
     this.shadowRoot.getElementById("time_picker_overlay").style.display = "none";
     this.shadowRoot.getElementById("time_picker_dialog").style.display = "none";
     this._currentTimeInput = null;
+    this._timeRangeInputs = null;
+    this._timeRangePrevValues = null;
   }
 
   _confirmTimePicker() {
     if (!this._currentTimeInput) return;
-    
-    const hour = parseInt(this.shadowRoot.getElementById("time_picker_hour").value) || 0;
-    const minute = parseInt(this.shadowRoot.getElementById("time_picker_minute").value) || 0;
-    
-    // 格式化时间为 HH:MM
-    const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-    
-    // 设置时间输入框的值
-    this._currentTimeInput.value = formattedTime;
-    
-    // 触发change事件
-    this._currentTimeInput.dispatchEvent(new Event('change', { bubbles: true }));
-    
-    // 如果是开始时间，自动聚焦到结束时间
-    if (this._currentTimeInput.dataset.timeType === "start") {
-      const timeRow = this._currentTimeInput.closest(".time-row");
-      if (timeRow) {
-        const endInput = timeRow.querySelector("[data-time-type='end']");
-        if (endInput) {
-          // 延迟一点时间，让用户看到开始时间已经设置
-          setTimeout(() => {
-            this._showTimePicker(endInput);
-          }, 300);
-        }
-      }
+
+    if (this._timeRangeInputs) {
+      // 区间模式：同时设置开始和结束时间
+      this._confirmRangeTime();
     } else {
-      // 如果是结束时间，检查时间重叠
-      this._checkAndHandleTimeOverlap();
+      // 单时间模式
+      this._confirmSingleTime();
     }
-    
+  }
+
+  _confirmSingleTime() {
+    const input = this._currentTimeInput;
+    const prevValue = input._prevValue || input.value;
+
+    const hour = parseInt(this.shadowRoot.getElementById("start_hour_slider").value) || 0;
+    const minute = parseInt(this.shadowRoot.getElementById("start_minute_slider").value) || 0;
+    const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+
+    input.value = formattedTime;
+
+    // 检查时间重叠
+    const hadOverlapBefore = this._checkTimeOverlapWith(input, prevValue);
+    const hasOverlapNow = this._checkTimeOverlap();
+    if (!hadOverlapBefore && hasOverlapNow) {
+      input.value = prevValue;
+      input._prevValue = prevValue;
+      this._hideTimePicker();
+      this._showOverlapError();
+      return;
+    }
+
+    input._prevValue = formattedTime;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
     this._hideTimePicker();
   }
 
-  _checkAndHandleTimeOverlap() {
-    // 检查时间重叠
-    if (this._checkTimeOverlap()) {
-      const statusMsg = this.shadowRoot.getElementById("status_msg");
-      if (statusMsg) {
-        statusMsg.textContent = _t(this._hass, 'time_overlap');
-        statusMsg.className = "status error";
-        setTimeout(() => { statusMsg.textContent = ""; }, 4000);
-      }
+  _confirmRangeTime() {
+    const { start: startInput, end: endInput } = this._timeRangeInputs;
+    const prevStart = this._timeRangePrevValues.start;
+    const prevEnd = this._timeRangePrevValues.end;
+
+    const sH = parseInt(this.shadowRoot.getElementById("start_hour_slider").value) || 0;
+    const sM = parseInt(this.shadowRoot.getElementById("start_minute_slider").value) || 0;
+    const eH = parseInt(this.shadowRoot.getElementById("end_hour_slider").value) || 0;
+    const eM = parseInt(this.shadowRoot.getElementById("end_minute_slider").value) || 0;
+
+    const newStart = `${sH.toString().padStart(2, '0')}:${sM.toString().padStart(2, '0')}`;
+    const newEnd = `${eH.toString().padStart(2, '0')}:${eM.toString().padStart(2, '0')}`;
+
+    // 临时设置新值用于重叠检查
+    startInput.value = newStart;
+    endInput.value = newEnd;
+
+    // 检查重叠：把两个值都回退到旧值，看之前是否已有重叠
+    startInput.value = prevStart;
+    endInput.value = prevEnd;
+    const hadOverlapBefore = this._checkTimeOverlap();
+
+    // 恢复新值
+    startInput.value = newStart;
+    endInput.value = newEnd;
+    const hasOverlapNow = this._checkTimeOverlap();
+
+    if (!hadOverlapBefore && hasOverlapNow) {
+      // 回滚
+      startInput.value = prevStart;
+      endInput.value = prevEnd;
+      startInput._prevValue = prevStart;
+      endInput._prevValue = prevEnd;
+      this._hideTimePicker();
+      this._showOverlapError();
+      return;
+    }
+
+    // 接受新值
+    startInput._prevValue = newStart;
+    endInput._prevValue = newEnd;
+    startInput.dispatchEvent(new Event('change', { bubbles: true }));
+    endInput.dispatchEvent(new Event('change', { bubbles: true }));
+    this._hideTimePicker();
+  }
+
+  _showOverlapError() {
+    const statusMsg = this.shadowRoot.getElementById("status_msg");
+    if (statusMsg) {
+      statusMsg.textContent = _t(this._hass, 'time_overlap');
+      statusMsg.className = "status error";
+      setTimeout(() => { statusMsg.textContent = ""; }, 4000);
     }
   }
 

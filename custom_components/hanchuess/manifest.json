@@ -5,7 +5,7 @@
   "documentation": "https://github.com/guoxiatech/hanchu-ess-ha",
   "requirements": [],
   "dependencies": ["frontend", "http", "websocket_api"],
-  "codeowners": [],
+  "codeowners": ["@guoxiatech"],
   "version": "1.0.24",
   "iot_class": "cloud_polling",
   "config_flow": true,

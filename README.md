@@ -64,6 +64,27 @@ A custom Home Assistant integration for monitoring and controlling Hanchuess ESS
 | Daily Grid Export | Today's grid export (kWh) |
 | Daily Generator Energy | Today's generator output (kWh) — only if device has generator |
 
+### Services
+
+The integration provides a single service, _hanchuess.fast_charge_ which provides a single step full power charge or discharge for the set time interval (like the Quick Execution button in the app)
+
+Used like this:
+```
+   service: hanchuess.fast_charge
+   data:
+     act: -3
+     duration: 120
+```
+
+with the duration in *seconds* and act code meaning
+
+| act | Action |
+|---|---|
+| 3 | Fast Discharge |
+| -3 | Stop Fast Discharge |
+| 2 | Fast Charge|
+| -2 | Stop Fast Charge |
+
 ## Token Expiration & Re-authentication
 
 The Hanchuess cloud token has a limited validity period. When the token expires, the integration will automatically attempt to refresh it. If the refresh fails, all device entities will become **Unavailable**:

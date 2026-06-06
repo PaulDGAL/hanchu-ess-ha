@@ -46,6 +46,13 @@ SENSORS = {
         "unit": UnitOfPower.WATT,
         "icon": "mdi:transmission-tower",
     },
+    "ext_ac_power": {
+        "key": "bypMeterTotalPower",
+        "device_class": SensorDeviceClass.POWER,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfPower.WATT,
+        "icon": "mdi:transmission-tower",
+    },
     "load_power": {
         "key": "loadPwr",
         "device_class": SensorDeviceClass.POWER,

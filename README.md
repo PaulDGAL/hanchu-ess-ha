@@ -6,6 +6,7 @@ A custom Home Assistant integration for monitoring and controlling Hanchuess ESS
 
 - **Real-time Monitoring** — Battery SOC, PV power, grid power, load power, battery power, generator power (if available)
 - **Daily Energy Statistics** — PV generation, battery charge/discharge, grid import/export, load consumption, generator energy (if available)
+- Service for **Fast Charge and Discharge** for use with Automations
 - **Remote Settings Card** — Custom Lovelace card for configuring work modes, charge/discharge time periods, and related parameters
 - **Fast Charge/Discharge** — Quick charge or discharge with configurable duration and one-click stop
 - **Multi-device Support** — Manage multiple devices under one account
@@ -46,6 +47,7 @@ A custom Home Assistant integration for monitoring and controlling Hanchuess ESS
 | Battery SOC | Battery state of charge (%) |
 | Battery Power | Battery charge/discharge power (W) |
 | PV Power | Solar photovoltaic power (W) |
+| Ext AC Power | AC Coupled Solar power (W) |
 | Grid Power | Grid import/export power (W) |
 | Load Power | Home load power (W) |
 | Generator Power | Diesel generator power (W) — only if device has generator |

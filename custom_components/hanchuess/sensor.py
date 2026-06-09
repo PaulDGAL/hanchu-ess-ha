@@ -51,7 +51,7 @@ SENSORS = {
         "device_class": SensorDeviceClass.POWER,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPower.WATT,
-        "icon": "mdi:transmission-tower",
+        "icon": "mdi:solar-power",
     },
     "load_power": {
         "key": "loadPwr",

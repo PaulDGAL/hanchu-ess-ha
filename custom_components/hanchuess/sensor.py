@@ -38,6 +38,7 @@ SENSORS = {
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPower.WATT,
         "icon": "mdi:solar-power",
+        "auto_watt": True,
     },
     "grid_power": {
         "key": "meterPPwr",
@@ -45,6 +46,7 @@ SENSORS = {
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPower.WATT,
         "icon": "mdi:transmission-tower",
+        "auto_watt": True,
     },
     "ext_ac_power": {
         "key": "bypMeterTotalPower",
@@ -52,6 +54,7 @@ SENSORS = {
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPower.WATT,
         "icon": "mdi:solar-power",
+        "auto_watt": True,
     },
     "load_power": {
         "key": "loadPwr",
@@ -59,6 +62,7 @@ SENSORS = {
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPower.WATT,
         "icon": "mdi:home-lightning-bolt",
+        "auto_watt": True,
     },
     "dg_power": {
         "key": "dgPAcTotal",
@@ -66,8 +70,16 @@ SENSORS = {
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPower.WATT,
         "icon": "mdi:engine",
+        "auto_watt": True,
         "condition_key": "hasDg",
         "condition_value": True,
+    },
+    "battery_capacity": {
+        "key": "bmsDesignCap",
+        "name": "Battery Capacity",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfEnergy.KILO_WATT_HOUR,
+        "icon": "mdi:battery",
     },
 }
 
@@ -295,6 +307,15 @@ class HanchueSensor(CoordinatorEntity, SensorEntity):
         value = self.coordinator.data.get(self._config["key"])
         if value is None:
             return None
+        if self._config.get("auto_watt"):
+            try:
+                v = float(value)
+                if abs(v) < 10:
+                    return round(v * 1000, 1)
+                else:
+                    return round(v, 1)
+            except (ValueError, TypeError):
+                return None
         if "scale" in self._config:
             try:
                 return round(float(value) * self._config["scale"], 1)

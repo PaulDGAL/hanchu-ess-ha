@@ -45,6 +45,7 @@
       "ext_ac_power": { "name": "Ext PV Power" },      
       "load_power": { "name": "负载功率" },
       "dg_power": { "name": "柴发功率" },
+      "battery_capacity": { "name": "Battery Capacity" },
       "daily_load_energy": { "name": "今日负载用电" },
       "daily_pv_energy": { "name": "今日光伏发电" },
       "daily_charge_energy": { "name": "今日充电量" },

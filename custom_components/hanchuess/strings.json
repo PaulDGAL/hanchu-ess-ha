@@ -45,6 +45,7 @@
       "ext_ac_power": { "name": "Ext PV Power" },
       "load_power": { "name": "Load Power" },
       "dg_power": { "name": "Generator Power" },
+      "battery_capacity": { "name": "Battery Capacity" },
       "daily_load_energy": { "name": "Daily Load Energy" },
       "daily_pv_energy": { "name": "Daily PV Energy" },
       "daily_charge_energy": { "name": "Daily Charge Energy" },

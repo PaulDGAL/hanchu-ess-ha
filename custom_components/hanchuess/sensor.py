@@ -74,6 +74,13 @@ SENSORS = {
         "condition_key": "hasDg",
         "condition_value": True,
     },
+    "battery_capacity": {
+        "key": "bmsDesignCap",
+        "name": "Battery Capacity",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfEnergy.KILO_WATT_HOUR,
+        "icon": "mdi:battery",
+    },
 }
 
 STATISTICS_SENSORS = {

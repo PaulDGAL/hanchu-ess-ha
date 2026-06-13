@@ -31,6 +31,7 @@ SENSORS = {
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPower.WATT,
         "icon": "mdi:battery-charging",
+        "auto_watt": True,
     },
     "pv_power": {
         "key": "pvTtPwr",
